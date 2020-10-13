@@ -1,0 +1,45 @@
+i equ 0x30  
+  equ 0x31
+
+
+START              
+
+
+    MOVLW 0x07     
+    MOVWF CMCON    
+    BCF STATUS, RP1    
+    BSF STATUS, RP0    
+    MOVLW B '00000001'
+    MOVWF TRISA
+    MOVLW b'00000000'  
+    MOVWF TRISB 
+    BCF STATUS, RP0   
+
+INICIO
+    MOVLW 255
+    MOVWF 1
+    MOVLW 6
+    MOVWF dado
+    
+DESPLEGAR
+    
+    MOVFW dado
+    MOVWF PORTB 
+    
+BOTON
+    
+    BTFSS PORTA, 0
+    GOTO BOTON 
+    
+DELAY
+
+    DECFSZ i,f
+    GOTO DELAY
+    MOVLW d'255'
+    movwf i
+    
+    
+    DECFSZ dado,f
+    GOTO DESPLEGAR
+    GOTO INICIO      
+END
