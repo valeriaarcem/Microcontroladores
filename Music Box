@@ -1,0 +1,320 @@
+ #include "p16F628a.inc"    ;incluir librerias relacionadas con el dispositivo
+ __CONFIG _FOSC_INTOSCCLK & _WDTE_OFF & _PWRTE_OFF & _MCLRE_OFF & _BOREN_OFF & _LVP_OFF & _CPD_OFF & _CP_OFF    
+;configuración del dispositivotodo en OFF y la frecuencia de oscilador
+;es la del "reloj del oscilador interno" (INTOSCCLK)     
+
+RES_VECT  CODE    0x0000            ; processor reset vector
+    GOTO    START                   ; go to beginning of program
+; TODO ADD INTERRUPTS HERE IF USED
+MAIN_PROG CODE                      ; let linker place main program
+
+d1   	    EQU   	 0x30   	 ;define 0x10 register as lower delay byte
+d2   	    EQU   	 0x31   	 ;define 0x11 register as upper delay byte
+periods    EQU   	 0x32   	 ;define 0x12 register as number of periods to play
+ 
+
+START              ;inicio global del programa
+
+
+    MOVLW 0x07         ;Apagar comparadores para trabajar en modo digital
+    MOVWF CMCON    
+    BCF STATUS, RP1    ;Cambiar al banco 1 apagando el RP1
+    BSF STATUS, RP0    ;Y encendiendo el RP0
+    MOVLW b'01111111'  ;Establecer puerto B como salida (los 8 bits del puerto)
+    MOVWF TRISB 
+    BCF STATUS, RP0    ;Regresar al banco 0 apagando el RP0
+
+LOOP
+    
+    CALL E2   			 ;mi
+    CALL D#2   		         ;re# 
+    CALL E2                      ;mi    
+    CALL D#2			 ;re#
+    CALL E2 ;mi
+    CALL H1 ;Si
+    CALL D2 ;re
+    CALL C2 ;do
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL C1 ;Do
+    CALL E1 ;Mi
+    CALL A1 ;La
+    CALL H1 ;Si
+    CALL H1 ;Si
+    CALL H1 ;Si
+    CALL E1 ;Mi
+    CALL G#1 ;Sol#
+    CALL H1 ;Si
+    CALL C2 ;do
+    CALL C2 ;do
+    CALL C2 ;do
+    CALL E1 ;Mi
+    CALL E2 ;mi
+    CALL D#2 ;re# 
+    CALL E2 ;mi    
+    CALL D#2 ;re#
+    CALL E2 ;mi
+    CALL H1 ;Di
+    CALL D2 ;re
+    CALL C2 ;do
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL C1 ;Do
+    CALL E1 ;Mi
+    CALL A1 ;La
+    CALL H1 ;Si
+    CALL H1 ;Si
+    CALL H1 ;Si
+    CALL E1 ;Mi
+    CALL C2 ;do
+    CALL H1 ;Si
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL E2   			 ;mi
+    CALL D#2   		         ;re# 
+    CALL E2                      ;mi    
+    CALL D#2			 ;re#
+    CALL E2 ;mi
+    CALL H1 ;Di
+    CALL D2 ;re
+    CALL C2 ;do
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL C1 ;Do
+    CALL E1 ;Mi
+    CALL A1 ;La
+    CALL H1 ;Si
+    CALL H1 ;Si
+    CALL H1 ;Si
+    CALL E1 ;Mi
+    CALL G#1 ;Sol#
+    CALL H1 ;Si
+    CALL C2 ;do
+    CALL C2 ;do
+    CALL C2 ;do
+    CALL E1 ;Mi
+    CALL E2 ;mi
+    CALL D#2 ;re# 
+    CALL E2 ;mi    
+    CALL D#2 ;re#
+    CALL E2 ;mi
+    CALL H1 ;Di
+    CALL D2 ;re
+    CALL C2 ;do
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL A1 ;La
+    ;-------
+    CALL C1 ;Do
+    CALL E1 ;Mi
+    CALL A1 ;La
+    CALL H1 ;Si
+    CALL H1 ;Si
+    CALL H1 ;Si
+    CALL E1 ;Mi
+    CALL C2 ;do
+    CALL H1 ;Si
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL A1 ;La
+    CALL H1 ;Si
+    CALL C2 ;do
+    CALL D2 ;re
+    CALL E2 ;mi
+    CALL E2 ;mi
+    CALL E2 ;mi
+    CALL G1 ;Sol
+    
+    SLEEP   			 ;Enable sleep mode
+    GOTO LOOP     		 ;loop forever
+ 
+E2  				 ;Note E of the 2nd octave
+    MOVLW D'255'   	             ;Load the number of periods to play
+    MOVWF periods
+LOOP_E2   			 ;Toggle pin GP2 with the specified frequency
+    MOVLW 1<<RB7   	 
+    XORWF TRISB, F      	 ;Toggle GP2
+    MOVLW D'251'   	 
+    MOVWF d1   		 ;Load lower delay byte
+    MOVLW 1   		 
+    MOVWF d2   		 ;Load upper delay byte
+    CALL DELAY   		 ;Perform delay
+    DECFSZ periods, F             ;Decrease the number of periods and check if it is 0
+    GOTO LOOP_E2   	 ;If no then keep toggling GP2
+    RETLW 0   			 ;Otherwise return from the subroutine
+ 
+D#2
+    MOVLW D'240'
+    MOVWF periods
+LOOP_D#2
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	
+    MOVLW D'10'
+    MOVWF d1
+    MOVLW 2
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_D#2
+    RETLW 0
+ 
+H1
+    MOVLW D'191'
+    MOVWF periods
+LOOP_H1
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	
+    MOVLW D'80'
+    MOVWF d1
+    MOVLW 2
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_H1
+    RETLW 0
+ 
+D2
+    MOVLW D'227'
+    MOVWF periods
+LOOP_D2
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	
+    MOVLW D'26'
+    MOVWF d1
+    MOVLW 2
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_D2
+    RETLW 0
+ 
+C2
+    MOVLW D'202'
+    MOVWF periods
+LOOP_C2
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	
+    MOVLW D'61'
+    MOVWF d1
+    MOVLW 2
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_C2
+    RETLW 0
+ 
+A1
+    MOVLW D'170'
+    MOVWF periods
+LOOP_A1
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	 
+    MOVLW D'121'
+    MOVWF d1
+    MOVLW 2
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_A1
+    RETLW 0
+ 
+C1
+    MOVLW D'101'
+    MOVWF periods
+LOOP_C1
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	 
+    MOVLW D'123'
+    MOVWF d1
+    MOVLW 3
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_C1
+    RETLW 0
+ 
+E1
+    MOVLW D'127'
+    MOVWF periods
+LOOP_E1
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	 
+    MOVLW D'248'
+    MOVWF d1
+    MOVLW 2
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_E1
+    RETLW 0
+F1
+    MOVLW D'133'
+    MOVWF periods
+LOOP_F1
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	 
+    MOVLW D'220'
+    MOVWF d1
+    MOVLW 2
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_E1
+    RETLW 0
+
+G1
+    MOVLW D'155'
+    MOVWF periods
+LOOP_G1
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	 
+    MOVLW D'168'
+    MOVWF d1
+    MOVLW 2
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_G#1
+    RETLW 0
+    
+G#1
+    MOVLW D'160'
+    MOVWF periods
+LOOP_G#1
+    MOVLW 1<<RB7
+    XORWF TRISB, F      	 
+    MOVLW D'144'
+    MOVWF d1
+    MOVLW 2
+    MOVWF d2
+    CALL DELAY
+    DECFSZ periods, F
+    GOTO LOOP_G#1
+    RETLW 0
+F2  				 ;Note E of the 2nd octave
+    MOVLW D'255'   	             ;Load the number of periods to play
+    MOVWF periods
+LOOP_F2   			 ;Toggle pin GP2 with the specified frequency
+    MOVLW 1<<RB7   	 
+    XORWF TRISB, F      	 ;Toggle GP2
+    MOVLW D'237'   	 
+    MOVWF d1   		 ;Load lower delay byte
+    MOVLW 1   		 
+    MOVWF d2   		 ;Load upper delay byte
+    CALL DELAY   		 ;Perform delay
+    DECFSZ periods, F             ;Decrease the number of periods and check if it is 0
+    GOTO LOOP_E2   	 ;If no then keep toggling GP2
+    RETLW 0   			 ;Otherwise return from the subroutine
+ 
+DELAY   			 ;Start DELAY subroutine here
+    DECFSZ d1, F   	             ;Decrement the register 0x10 and check if not zero
+    GOTO DELAY   		 ;If not then go to the DELAY_LOOP label
+    DECFSZ d2, F   	             ;Else decrement the register 0x11, check if it is not 0
+    GOTO DELAY   		 ;If not then go to the DELAY_LOOP label
+    RETLW 0   			 ;Else return from the subroutine
+ 
+    END
